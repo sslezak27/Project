@@ -14,6 +14,7 @@ class MYPROJECT4_API AMyCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();
+	virtual int Roll_Iniciative;
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,8 +22,8 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	virtual void Move_My_Character(const FVector& position);
+	virtual void Tick(float DeltaTime) override;	
+	void Move_My_Character(const FVector& position);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
