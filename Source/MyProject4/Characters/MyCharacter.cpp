@@ -2,7 +2,7 @@
 
 
 #include "MyCharacter.h"
-#include "AIController.h"
+#include "Controllers/AI_Controller.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 
@@ -10,10 +10,58 @@
 AMyCharacter::AMyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	Targeted_Circle = CreateDefaultSubobject<UDecalComponent>("Targeted_Circle");
+	Targeted_Circle->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Characters/M_Cursor_Decal.M_Cursor_Decal'"));
+	if (DecalMaterialAsset.Succeeded())
+	{
+		Targeted_Circle->SetDecalMaterial(DecalMaterialAsset.Object);
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "SUCCES");
+
+	}
+	Targeted_Circle->DecalSize = FVector(1, 1, 1);
+	Targeted_Circle->SetWorldScale3D(FVector(0, 0, 0));
+	Attack_Melee_Skill = FMath::FRandRange(1, 20);
+	Defence_Melee_Skill = FMath::FRandRange(1, 20);
+
+	//PrimaryActorTick.bStartWithTickEnabled = true;
+
+
 
 }
 
+
+
+int AMyCharacter::Roll_Iniciative()
+{
+	Iniciative = 1;
+	return 1;
+}
+bool AMyCharacter::Do_Turn(FVector Move_Location)
+{	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "Turn Started");
+	//if(Is_Placed)
+	Move_My_Character(GetActorLocation() - FVector(FMath::FRandRange(-150, 150), FMath::FRandRange(-150,150), 0));
+	return true;
+}
+
+void AMyCharacter::Move_End()
+{
+	Turn_End();
+}
+
+void AMyCharacter::Turn_End()
+{
+	if (!Is_Placed)
+	{
+		Is_Placed = true;
+	}
+	Is_Attacking = false;
+	Turn_Done = true;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "Turn Ended");
+}
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
@@ -40,16 +88,119 @@ void AMyCharacter::Move_My_Character(const FVector& position)
 {
 	UNavigationPath* path = UNavigationSystemV1::FindPathToLocationSynchronously(this, this->GetActorLocation(), position);
 
-	if (path && path->IsValid())
+	/**if (path && path->IsValid())
 	{
 		FAIMoveRequest req;
 		req.SetAcceptanceRadius(50);
 		req.SetUsePathfinding(true);
-
-		AAIController* ai = Cast<AAIController>(this->GetController());
+		**/
+		AAI_Controller* ai = Cast<AAI_Controller>(this->GetController());
 		if (ai)
 		{
-			ai->RequestMove(req, path->GetPath());
+			//ai->RequestMove(req, path->GetPath());
+			ai->MoveToLocation(position);
+		}
+	//}
+}
+
+bool AMyCharacter::Attack_Target(AMyCharacter* Target)
+{
+	Is_Attacking = true;
+	Target_Of_Attack = Target;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "MY_CHARACTER_ATTACK_CALLED");
+	if (Calculate_Attack_Succes(Target))
+		Target->Be_Attacked(&Current_Skill);
+	else
+		Target->Set_Dodge(true);
+	return true;
+}
+
+bool AMyCharacter::Calculate_Attack_Succes(AMyCharacter* Target)
+{
+	float Chance_To_Hit = Current_Skill.Base_Hit_Chance * Attack_Melee_Skill / Target->Get_Defence_Melee_Skill();
+	if (FMath::FRandRange(1, 100) <= Chance_To_Hit)
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
+void AMyCharacter::Be_Attacked(Attack_Base* Skill)
+{
+	if (Is_Alive)
+	{
+		Is_Being_Attacked = true;
+		HP -= Skill->Attack_Dmg;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::FromInt(HP));
+		if (HP <= 0)
+		{
+			Set_Dodge(false);
+			DIE();
 		}
 	}
+}
+
+Attack_Base* AMyCharacter::Get_Skill()
+{
+	return &Current_Skill;
+}
+
+void AMyCharacter::Be_Targeted()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "YOUCALLED");
+	Targeted_Circle-> SetWorldScale3D(FVector(100, 100, 100));
+}
+
+void AMyCharacter::DIE()
+{
+	Is_Alive = false;
+}
+
+void AMyCharacter::Reset_Targeted()
+{
+	Targeted_Circle->SetWorldScale3D(FVector(0, 0, 0));
+}
+
+
+bool AMyCharacter::Get_Is_Attacking() const
+{
+	return Is_Attacking;
+}
+
+void AMyCharacter::End_Attack()
+{
+	Turn_End();
+}
+
+AMyCharacter* AMyCharacter::Get_Target() const
+{
+	return Target_Of_Attack;
+}
+
+bool AMyCharacter::Get_Is_Being_Attacked() const
+{
+	return Is_Being_Attacked;
+}
+
+float AMyCharacter::Get_Defence_Melee_Skill() const
+{
+	return Defence_Melee_Skill;
+}
+
+bool AMyCharacter::Get_Is_Dodging() const
+{
+	return Is_Dodging;
+}
+
+void AMyCharacter::Set_Dodge(bool Dodge)
+{
+	Is_Dodging = Dodge;
+	Is_Being_Attacked = false;
+}
+
+bool AMyCharacter::Get_Is_Alive() const
+{
+	return Is_Alive;
 }
