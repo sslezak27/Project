@@ -49,10 +49,11 @@ void Combat_Manager::Get_Locations(bool IS_Player_Turn)
 		{
 			if (Player_Characters[Iterator]->Is_Alive)
 			{
-				Character_Locations.Add(Player_Characters[Iterator]->GetActorLocation());
-				if ((Current_AI->GetActorLocation() - Character_Locations[Iterator]).Size() <= Current_Attack->Attack_Range)
+				FVector Location = Player_Characters[Iterator]->GetActorLocation();
+				Character_Locations.Add(Location);
+				if ((Current_AI->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range)
 				{
-					Valid_Targets.Add(Character_Locations[Iterator]);
+					Valid_Targets.Add(Location);
 					Player_Characters[Iterator] ->Be_Targeted();
 				}
 			}
@@ -64,11 +65,13 @@ void Combat_Manager::Get_Locations(bool IS_Player_Turn)
 		{
 			if (AI_Characters[Iterator]->Is_Alive)
 			{
-				Character_Locations.Add(AI_Characters[Iterator]->GetActorLocation());
+				FVector Location = AI_Characters[Iterator]->GetActorLocation();
+				Character_Locations.Add(Location);
+				//Character_Locations.Add(AI_Characters[Iterator]->GetActorLocation());
 				for(int iterator = 0;iterator < Character_Locations.Num();iterator++)
-				if ((Current_Player->GetActorLocation() - Character_Locations[iterator]).Size() <= Current_Attack->Attack_Range)
+				if ((Current_Player->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range)
 				{
-					Valid_Targets.Add(Character_Locations[iterator]);
+					Valid_Targets.Add(Location);
 					AI_Characters[Iterator]->Be_Targeted();
 				}
 			}
@@ -112,7 +115,7 @@ AMyCharacter* Combat_Manager::Calculate_AI_Move_Target(AAI_Character* AI_Charact
 			{
 				Temp_Weight -= (AI_Character->GetActorLocation() - Character_Locations[Iterator]).Size() * AI_Target_Move_Weight;
 			}
-			Temp_Weight += Player_Characters[Iterator]->HP * AI_Target_HP_Weight;
+			Temp_Weight += Player_Characters[Iterator]->Get_Health() * AI_Target_HP_Weight;
 			Weight.Add(Iterator, Temp_Weight);
 		}
 	}

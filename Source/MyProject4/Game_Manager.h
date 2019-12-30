@@ -13,6 +13,7 @@
 #include "Characters/Player_Characters/Player_Character.h"
 #include "Characters/Controllers/AI_Controller.h"
 #include "Managers/Combat_Manager.h"
+#include "HUD/A_Hud.h"
 
 #include "Game_Manager.generated.h"
 
@@ -26,13 +27,15 @@ public:
 	// Sets default values for this actor's properties
 	AGame_Manager();
 	int Turn_Done[7] = {};
+	AA_HUD* HUD = nullptr;
 	//TActorIterator<AMyCharacter>* Characters[7] = {};
 	TArray<AMyCharacter*> Characters;
 	bool Player_Turn = false;    //Obs³uga tury gracza
 	void Move_Player(FVector &Location);
 	void Attack_Player(AMyCharacter* Target);
 	void End_Player_Turn();
-
+	void Reset_Player_Targets();
+ 
 	TArray<AAI_Character*> AI_Characters;
 	TArray<APlayer_Character*> Player_Characters;
 

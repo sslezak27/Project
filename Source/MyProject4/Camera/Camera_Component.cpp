@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Camera_Component.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h" 
 
-#include "Camera_Component.h"
+
 
 UCamera_Component::UCamera_Component()
 {

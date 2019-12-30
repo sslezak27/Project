@@ -15,9 +15,11 @@ APlayer_Controller::APlayer_Controller()
 void APlayer_Controller::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+
 	InputComponent->BindAction("Idzdocelu", IE_Pressed, this, &APlayer_Controller::Select_Location);
 	InputComponent->BindAction("Koniec_Tury", IE_Pressed, this, &APlayer_Controller::End_Player_Turn);
-
+	InputComponent->BindAction("Character_Sheet", IE_Pressed, this, &APlayer_Controller::Bring_Character_Sheet).bExecuteWhenPaused = true;;
 
 
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &APlayer_Controller::ZoomIn);
@@ -36,8 +38,11 @@ void APlayer_Controller::SetupInputComponent()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "BINDED_CONTROLLER");
 	GameManager = GetWorld()->SpawnActor<AGame_Manager>(FVector(0, 0, 50), FRotator::ZeroRotator);
+	
 
 
+
+	
 }
 
 void APlayer_Controller::End_Player_Turn()
@@ -48,9 +53,37 @@ void APlayer_Controller::End_Player_Turn()
 	}
 }
 
+void APlayer_Controller::Bring_Character_Sheet()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "Called_Bring_This");
+
+	if (HUD->Get_To_Draw_Character_Sheet())
+	{
+		HUD->Set_To_Draw_Character_Sheet(false);
+		SetPause(false);
+	}
+	else
+	{
+		HUD->Set_To_Draw_Character_Sheet(true);
+		SetPause(true);
+	}
+
+}
+
 void APlayer_Controller::OnPossess(APawn* PossessedPawn)
 {
 	Super::OnPossess(PossessedPawn);
+}
+
+void APlayer_Controller::BeginPlay()
+{
+	Super::BeginPlay();
+	SetInputMode(FInputModeGameAndUI());
+	if (HUD == nullptr)
+	{
+		if ((HUD = Cast<AA_HUD>(GetHUD())) != nullptr)
+			GameManager->HUD = HUD;
+	}
 }
 
 void APlayer_Controller::Select_Location()
@@ -81,12 +114,11 @@ void APlayer_Controller::Select_Location()
 			else
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CALLING_NOTHING");
 		}
-		
+
 
 
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CALLING_NO THING");
+
 }
 
 
@@ -94,7 +126,41 @@ void APlayer_Controller::Select_Location()
 void APlayer_Controller::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (HUD == nullptr)
+	{
+		if ((HUD = Cast<AA_HUD>(GetHUD())) != nullptr)
+			GameManager->HUD = HUD;
+	}
+	Ticks_Passed += DeltaTime;
+	if (Ticks_Passed >= Ticks_To_Pass) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CALLING_NOTHING");
+		Ticks_Passed = 0;
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, false, Hit);
+		if (Hit.GetActor() != nullptr)
+		{
+			if ((A_Character = Cast<AMyCharacter>(Hit.GetActor())) != nullptr)
+			{
+				//if (HUD->Get_Current_Selected_Character() != A_Character)
+				//{	
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CALLING_YOURMOMG");
+				HUD->Set_Current_Selected_Character(A_Character);
+				//}
 
+			}
+			else
+				HUD->Set_Current_Selected_Character(nullptr);
+
+
+		}
+	}
+	
+}
+
+void APlayer_Controller::Change_Skill(int skill)
+{
+	HUD->Change_Skill(skill);
+	GameManager->Reset_Player_Targets();
 }
 
 //OBS£UGA CAMERY

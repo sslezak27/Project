@@ -27,7 +27,11 @@ APlayer_Character::APlayer_Character()
 	if(GEngine)
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CONSTRUCTED THIS uadhkgaejjeagfkjaeguejgkfulkesgfluisrgrsgjflsgfksljrhglkgrslkrs");
 
+	Active_Weapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"));
+	//Weapon = CreateDefaultSubobject<Base_Weapon>(TEXT("WEAPON"));
 
+	Attack_Base Temp_Skill(20.0f, 50.f, 70.f, 1, 500.f, 0.f,0, 10);
+	Current_Skill = Temp_Skill;
 }
 
 void APlayer_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -35,25 +39,27 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+void APlayer_Character::BeginPlay()
+{
+	Super::BeginPlay();
+	//Active_Weapon = Base_Weapon->Get_Component(Weapon_Type);
+	Attack_Primary = BaseWeapon.Get_Attack_Primary(Weapon_Type);
+	Attack_Secondary = BaseWeapon.Get_Attack_Secondary(Weapon_Type);
+	Current_Skill = Attack_Primary;
+	//UStaticMesh* Mesh_To_Set = Get_Component(Weapon_Type);
+	UStaticMesh* Mesh_To_Set = BaseWeapon.Get_Component(Weapon_Type);;
+	if (Mesh_To_Set != nullptr)
+	{
+		Active_Weapon->SetStaticMesh(Mesh_To_Set);
+		if (Active_Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true), FName("Socket_Weapon")))
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "WE DID IT BOYSZZZZZZZZZx");
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "WE DID IT BOYSZZZZZZZZZxMISSSIONFAILED");
+}
 void APlayer_Character::Jumps()
 {
-	/**GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CALLED_IT");
 	
-	if (APlayer_Controller* PC = Cast<APlayer_Controller>(GetController()))
-	{
-		FHitResult Hit;
-		PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			Change_Ownership();
-			//if(Cast<AAI_Controller>(GetController()) != nullptr)
-				//SimpleMoveToLocation(Hit.ImpactPoint);
-		//	else
-			//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "SUM_THING_WONG");
-		}
-	}
-	**/
 }
 
 int APlayer_Character::Roll_Iniciative()
@@ -66,6 +72,7 @@ bool APlayer_Character::Do_Turn(FVector Move_Location)
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::FromInt(HP));
 
 	//if (Is_Placed)
+	Move_Done = true;
 	Is_Turn = false;
 	//FRotator Current_Rotator = GetViewRotation();
 	//double Yaw = Pathfinder.Calculate_Absolute_Yaw(GetActorLocation(), Move_Location);
@@ -77,6 +84,7 @@ bool APlayer_Character::Do_Turn(FVector Move_Location)
 		Move_Location = Pathfinder.Calculate_Path(Action_Points_Current, GetActorLocation(), Move_Location,0);
 		Reset_Scale();
 		//Move_My_Character(Move_Location);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "Movin");
 		Move_My_Character(FVector(Move_Location.X,Move_Location.Y,0.0f));
 		Move_Done = false;
 		return true;
@@ -94,13 +102,13 @@ void APlayer_Character::Tick(float DeltaTime)
 
 void APlayer_Character::Turn_End()
 {
-	Reset_Scale();
+	Reset_Scale();	
 	Is_Turn = false;
 	if (!Is_Placed)
 	{
 		Is_Placed = true;
 	}
-
+	Move_Done = true;
 	Turn_Done = true;
 	Is_Attacking = false;
 	Target_Of_Attack = nullptr;
@@ -139,40 +147,68 @@ bool APlayer_Character::Attack_Target(AMyCharacter* Target)
 	Is_Turn = false;
 
 
-
-	if ((GetActorLocation() - Target->GetTargetLocation()).Size() <= Current_Skill.Attack_Range)
+	if(!Is_Attacking && Target->Get_Health() > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 1");
-		FRotator Current_Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
-
-		//Current_Rotator.Yaw =
-		FaceRotation(Current_Rotator);
-		Reset_Scale();
-		Is_Attacking = true;
-		Target_Of_Attack = Target;
-		if (Calculate_Attack_Succes(Target))
-			Target->Be_Attacked(&Current_Skill);
-		else
-			Target->Set_Dodge(true);
-		//Turn_End();
-
-		return true;
-
-	}
-	else if (Action_Points_Current > 0)
+		if (Current_Skill.Attack_Type == 0)
 		{
-		if (Do_Turn(Target->GetTargetLocation())) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 2");
+			if ((GetActorLocation() - Target->GetTargetLocation()).Size() <= Current_Skill.Attack_Range)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 1");
+				FRotator Current_Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
+
+				//Current_Rotator.Yaw =
+				FaceRotation(Current_Rotator);
+				Reset_Scale();
+				Is_Attacking = true;
+				Target_Of_Attack = Target;
+				if (Calculate_Attack_Succes(Target))
+					Target->Be_Attacked(&Current_Skill);
+				else
+					Target->Set_Dodge(true);
+				//Turn_End();
+
+				return true;
+
+			}
+			else if (Action_Points_Current > 0)
+			{
+				if (Do_Turn(Target->GetTargetLocation())) {
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 2");
+
+					return true;
+				}
+				else
+					return false;
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 3");
+				return false;
+			}
+		}
+
+		else if (Current_Skill.Attack_Type == 1)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET RANGED");
+			FRotator Current_Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
+
+			//Current_Rotator.Yaw =
+			FaceRotation(Current_Rotator);
+			Reset_Scale();
+			Is_Attacking = true;
+			Target_Of_Attack = Target;
+			FVector Current_Location = GetActorLocation();
+			FVector Arrow_Location = FVector(Current_Location.X, Current_Location.Y, Current_Location.Y + 100.f);
+
+			Current_Arrow = GetWorld()->SpawnActor<AArrow>(Arrow_Location, Current_Rotator);
+			Current_Arrow->Setup_Component(Current_Skill.Calculate_Attack_Yaw(Arrow_Location,Target->GetActorLocation()), Current_Skill.Ranged_Vx, Current_Rotator);
+			//Turn_End();
 
 			return true;
 		}
 		else
 			return false;
-		}
+	}
 	else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET 3");
-			return false;
-		}
-
+		return false;
 }

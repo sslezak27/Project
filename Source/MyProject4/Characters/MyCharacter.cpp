@@ -23,8 +23,27 @@ AMyCharacter::AMyCharacter()
 	}
 	Targeted_Circle->DecalSize = FVector(1, 1, 1);
 	Targeted_Circle->SetWorldScale3D(FVector(0, 0, 0));
-	Attack_Melee_Skill = FMath::FRandRange(1, 20);
-	Defence_Melee_Skill = FMath::FRandRange(1, 20);
+	Attack_Melee_Skill = FMath::FRandRange(1, 100);
+	Defence_Melee_Skill = FMath::FRandRange(1, 100);
+	Ranged_Skill_Aim = FMath::FRandRange(1, 100);
+	Skill_Strength = FMath::FRandRange(1, 100);
+	Weapon_Type = FMath::FRandRange(0, 2) - 0.001;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Swordasset(TEXT("StaticMesh'/Game/CloseCombat/Weapon/Swords/FuturisticSword/Meshes/SM_FuturisticSword.SM_FuturisticSword'"));
+	if (Swordasset.Succeeded())
+	{
+		if (UStaticMesh* cast_Mesh = Cast<UStaticMesh>(Swordasset.Object))
+			Mesh_Sword = cast_Mesh;
+		else
+			Mesh_Sword = nullptr;
+
+	}
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Axeasset(TEXT("StaticMesh'/Game/CloseCombat/Weapon/Swords/SwordOfDarkness/Meshes/SM_SwordOfDarkness.SM_SwordOfDarkness'"));
+	if (Axeasset.Succeeded())
+	{
+		Mesh_Axe = Axeasset.Object;
+
+	}
 
 	//PrimaryActorTick.bStartWithTickEnabled = true;
 
@@ -75,6 +94,22 @@ void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMyCharacter::Change_Skill(int skill)
+{
+	switch(skill)
+	{
+	case 0:
+		Current_Skill = Attack_Primary;
+		break;
+	case 1:
+		Current_Skill = Attack_Secondary;
+		break;
+	default:
+		Current_Skill = Attack_Primary;
+		break;
+	}
 }
 
 // Called to bind functionality to input
@@ -184,7 +219,7 @@ bool AMyCharacter::Get_Is_Being_Attacked() const
 	return Is_Being_Attacked;
 }
 
-float AMyCharacter::Get_Defence_Melee_Skill() const
+int AMyCharacter::Get_Defence_Melee_Skill() const
 {
 	return Defence_Melee_Skill;
 }
@@ -203,4 +238,41 @@ void AMyCharacter::Set_Dodge(bool Dodge)
 bool AMyCharacter::Get_Is_Alive() const
 {
 	return Is_Alive;
+}
+
+float AMyCharacter::Get_Health() const
+{
+	return HP;
+}
+float AMyCharacter::Get_Max_HP() const
+{
+	return Max_HP;
+}
+
+int AMyCharacter::Get_Attack_Melee_Skill() const
+{
+	return Attack_Melee_Skill;
+}
+
+
+UStaticMesh* AMyCharacter::Get_Component(int type)
+{
+	switch (type)
+	{
+	case 0:
+		return Mesh_Axe;
+		break;
+	case 1:
+		//	if (Sword != nullptr)
+		//if (UStaticMesh* Mesh = Cast<UStaticMesh>(Sword))
+			return Mesh_Sword;
+		//else
+			//return nullptr;
+		//	else
+				//return nullptr;
+		break;
+	default:
+		return nullptr;
+		break;
+	}
 }

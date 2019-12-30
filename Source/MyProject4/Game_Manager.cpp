@@ -200,18 +200,20 @@ int AGame_Manager::Next_Turn()
 					Manager_Combat.Reset_Targets();
 					Manager_Combat.Get_AI_Skill(AI_Character);
 					AI_Character->Do_AI_Turn(Manager_Combat.Calculate_AI_Move_Target(AI_Character)); //DO ZAMIANY!!!!!!!!!!!!
-
+					HUD->Set_Current_APlayer_In_Player(nullptr);
 				}
 				else if ((Player_Character = Cast<APlayer_Character>(Characters[iterator])) != nullptr)
 				{
 					AI_Game_Controller->Possess(Characters[iterator]);
 					Player_Turn = true;
 					Player_Character->Change_Scale();
-					Manager_Combat.Reset_Targets();
-					Manager_Combat.Get_Player_Skill(Player_Character);
+					Reset_Player_Targets();
+					HUD->Set_Current_APlayer_In_Player(Player_Character);
 				}
 
 				Is_Calculating_Next_Order = false;
+				if(HUD != nullptr)
+				HUD->Set_Current_Player_Character(Characters[iterator]);
 				return 1;
 			}
 
@@ -248,5 +250,11 @@ void AGame_Manager::End_Player_Turn()
 			Player_Character->Turn_End();
 		}
 	}
+}
+
+void AGame_Manager::Reset_Player_Targets()
+{
+	Manager_Combat.Reset_Targets();
+	Manager_Combat.Get_Player_Skill(Player_Character);
 }
 

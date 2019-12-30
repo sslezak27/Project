@@ -6,8 +6,8 @@
 #include "Characters/MyCharacter.h"
 #include "Characters/Controllers/AI_Controller.h"
 #include "Pathfinding/Pathfinder.h"
-
-
+#include "Characters/Skills/Attack_Effects/Arrow.h"
+#include "Characters/Skills/Weapons/Base_Weapon.h"
 
 #include "Player_Character.generated.h"
 
@@ -26,7 +26,7 @@ class MYPROJECT4_API APlayer_Character : public AMyCharacter
 		virtual void Tick(float DeltaTime) override;
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 			class UDecalComponent* CursorToWorld;
-		virtual void Move_End() override;
+		virtual void Move_End() override;				
 		AAI_Controller* AI_Controller = nullptr;
 		void Reset_Scale(); //Resetuje rozmiar ko³a
 		void Change_Scale(); //Zmienia rozmiar ko³a
@@ -38,12 +38,24 @@ class MYPROJECT4_API APlayer_Character : public AMyCharacter
 
 	private:
 
+		AArrow* Current_Arrow = nullptr;
+
+
 		void Jumps();
 		Pathfinder Pathfinder;
+//	UPROPERTY(VisibleDefaultsOnly, Category = "Sword") // This is so we can set the mesh in the editor
+	//	UStaticMeshComponent* Weapon;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Sword") // This is so we can set the mesh in the editor
+		UStaticMeshComponent* Active_Weapon;
+public:
+//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sword") // This is so we can set the mesh in the editor
+	//UPROPERTY()
+	Base_Weapon BaseWeapon;
 
-		protected:
+	protected:
 		
 			virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 			int Iniciative = 50;
-	
+protected:
+	virtual void BeginPlay() override;
 };

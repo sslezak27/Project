@@ -20,8 +20,8 @@ class MYPROJECT4_API AMyCharacter : public ACharacter
 private:
 	virtual void Turn_End();
 	virtual void DIE();
-	float Attack_Melee_Skill = 10;
-	float Defence_Melee_Skill = 10;
+	int Attack_Melee_Skill = 10;
+	int Defence_Melee_Skill = 10;
 	bool Is_Dodging = false;
 
 
@@ -46,11 +46,14 @@ public:
 	virtual AMyCharacter* Get_Target() const;
 	virtual bool Get_Is_Being_Attacked() const;
 	virtual bool Calculate_Attack_Succes(AMyCharacter* Target);
-	virtual float Get_Defence_Melee_Skill() const;
+	virtual int Get_Defence_Melee_Skill() const;
 	virtual bool Get_Is_Dodging() const;
 	virtual void Set_Dodge(bool Dodge);
 	virtual bool Get_Is_Alive() const;
 	AMyCharacter* Target_Of_Attack;
+	virtual float Get_Health() const;
+	virtual float Get_Max_HP() const;
+	virtual int Get_Attack_Melee_Skill() const;
 
 
 	bool Is_Being_Attacked = false;
@@ -60,22 +63,34 @@ public:
 	bool Move_Done = true;
 	bool Is_Placed = false;
 	bool Is_Alive = true;
-	float HP = 100;
+
 	int Iniciative;
 
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+	float HP = 100;
+	float Max_HP = 100;
 
+	int Skill_Strength;
+	int Ranged_Skill_Aim;
+	UPROPERTY()
+	UStaticMesh* Mesh_Axe = nullptr;
+	UPROPERTY()
+	UStaticMesh* Mesh_Sword = nullptr;
+	UStaticMesh* Get_Component(int type);
 	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;	
 	void Move_My_Character(const FVector& position);
+	int Weapon_Type;
+	Attack_Base Attack_Primary;
+	Attack_Base Attack_Secondary;
 
+	void Change_Skill(int skill);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
