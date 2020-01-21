@@ -26,6 +26,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool isDodging;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool isGunman;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool isAlive = true;
 	UFUNCTION(BlueprintCallable, Category = "UpdateAnimationProperties")
 		void UpdateAnimationProperties();

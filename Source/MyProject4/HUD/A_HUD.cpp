@@ -184,6 +184,7 @@ void AA_HUD::DrawCharacterSheet(AMyCharacter* Target)
 
 }
 
+
 void AA_HUD::Set_Current_Player_Character(AMyCharacter* Target)
 {
 	Current_Player_Character = Target;
@@ -200,7 +201,7 @@ void AA_HUD::Set_Current_APlayer_In_Player(AMyCharacter* Target)
 	if (Current_APlayer_In_Player != nullptr)
 		DrawMain(true);
 	else
-		DrawMain(false);
+		DrawMain(false);	
 
 }
 
@@ -223,6 +224,39 @@ void AA_HUD::Set_To_Draw_Character_Sheet(bool draw)
 bool AA_HUD::Get_To_Draw_Character_Sheet()
 {
 	return To_Draw_Character_Sheet;
+}
+
+bool AA_HUD::Get_To_Draw_Game_Menu()
+{
+	return To_Draw_Game_Menu;
+}
+
+void AA_HUD::DrawGameMenu(bool draw)
+{
+	To_Draw_Game_Menu = draw;
+	if (To_Draw_Game_Menu == true)
+	{
+		AddWidget(Manu_Pause_Widget);
+	}
+
+	else
+	{
+		RemoveWidget(Manu_Pause_Widget);
+	}
+}
+
+void AA_HUD::DrawMainMenu(bool draw)
+{
+	To_Draw_Main_Menu = draw;
+	if (To_Draw_Main_Menu == true)
+	{
+
+		ChangeWidget(Main_Menu_Widget);
+	}
+	else
+	{
+		ChangeWidget(nullptr);
+	}
 }
 
 float AA_HUD::Get_Health_Percentage()
@@ -354,6 +388,41 @@ float AA_HUD::Get_Hit(int main) const
 		return 0;
 }
 
+bool AA_HUD::Is_Skill_Magical(int main)
+{
+	if (Get_Current_APlayer_In_Player() != nullptr)
+		if (main == 0)
+			if (Get_Current_APlayer_In_Player()->Attack_Primary.Ranged_Type == 2)
+			{
+				End_Player_Aim = false;
+				return true;
+			}
+			else
+				return false;
+		else
+			if (Get_Current_APlayer_In_Player()->Attack_Secondary.Ranged_Type == 2)
+			{
+				End_Player_Aim = false;
+				return true;
+			}
+			else
+				return false;
+	else
+		return false;
+}
+
+void AA_HUD::Set_Magic_Power(float X_Speed, float Y_Speed) const
+{
+	if (Get_Current_APlayer_In_Player() != nullptr)
+		Get_Current_APlayer_In_Player()->Set_Mage_Projectile_Speed(X_Speed, Y_Speed);
+}
+
+void AA_HUD::Cancel_Fire()
+{
+	if (Get_Current_APlayer_In_Player() != nullptr)
+		End_Player_Aim = true;
+}
+
 void AA_HUD::ChangeWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 {
 
@@ -374,4 +443,31 @@ void AA_HUD::ChangeWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "duas");
+}
+
+void AA_HUD::AddWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+{
+
+	if (NewWidgetClass != nullptr)
+	{
+		MenuWidget.Add(CreateWidget<UUserWidget>(GetWorld(), NewWidgetClass));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "bbvbvbv");
+		MenuWidget.Last()->AddToViewport();
+	}
+}
+
+void AA_HUD::RemoveWidget(TSubclassOf<UUserWidget> NewWidgetClass,int index)
+{
+	if (NewWidgetClass != nullptr)
+	{
+		if (index < 0)
+		{
+			(MenuWidget[MenuWidget.Num() - 1])->RemoveFromViewport();
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "bbvbvbv");
+			MenuWidget[index]->RemoveFromViewport();
+		}
+	}
 }

@@ -164,6 +164,25 @@ void UCamera_Component::RotateY(const float value)
 	Camera_Angle.Pitch += 10*value;
 }
 
+void UCamera_Component::Set_Camera_Location(FVector Location,FRotator Rotation)
+{
+
+	APawn* ownerPawn = GetOwnerPawn();
+	if (ownerPawn != nullptr)
+	{
+		APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
+		Camera_Angle = Rotation;
+		MoveForward(Location.X);
+		MoveRight(Location.Y);
+		SetZoomLevel(Location.Z);
+
+	}
+}
+
+void UCamera_Component::Reset_Camera_Location()
+{
+}
+
 
 
 /**ARTSBR_PlayerController* UCamera_Component::UGameplayStatics::GetPlayerController(this,0) const

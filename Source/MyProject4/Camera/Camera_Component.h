@@ -31,6 +31,8 @@ public:
 	void SetZoomLevel(float level);
 	void RotateX(float value);
 	void RotateY(float value);
+	void Set_Camera_Location(FVector Location,FRotator Rotation);
+	void Reset_Camera_Location();
 
 	//void ClampCameraLocation(const APlayerController* playerController, FVector& outCameraLocation) const;
 
@@ -46,6 +48,9 @@ private:
 	float zoomAlpha_;
 	float movementSpeed_;
 
+	FVector Target_Location;
+
+
 	bool bShouldClampCamera_ : 1;
 
 	FBox cameraMovementBounds_;
@@ -55,4 +60,4 @@ private:
 	//	ARTSBR_PlayerController* GetPlayerController() const;
 	//void UpdateCameraBounds(const APlayerController* playerController) const;
 };
-
+	

@@ -47,34 +47,33 @@ void Combat_Manager::Get_Locations(bool IS_Player_Turn)
 	{
 		for (int Iterator = 0; Iterator < Player_Characters.Num(); Iterator++)
 		{
-			if (Player_Characters[Iterator]->Is_Alive)
-			{
+
 				FVector Location = Player_Characters[Iterator]->GetActorLocation();
 				Character_Locations.Add(Location);
-				if ((Current_AI->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range)
+				if ((Current_AI->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range && (Player_Characters[Iterator]->Is_Alive))
+				
 				{
 					Valid_Targets.Add(Location);
 					Player_Characters[Iterator] ->Be_Targeted();
 				}
-			}
+			
 		}
 	}
 	else
 	{
 		for (int Iterator = 0; Iterator < AI_Characters.Num(); Iterator++)
 		{
-			if (AI_Characters[Iterator]->Is_Alive)
-			{
+
 				FVector Location = AI_Characters[Iterator]->GetActorLocation();
 				Character_Locations.Add(Location);
 				//Character_Locations.Add(AI_Characters[Iterator]->GetActorLocation());
 				for(int iterator = 0;iterator < Character_Locations.Num();iterator++)
-				if ((Current_Player->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range)
+				if ((Current_Player->GetActorLocation() - Location).Size() <= Current_Attack->Attack_Range && (AI_Characters[Iterator]->Is_Alive))
 				{
 					Valid_Targets.Add(Location);
 					AI_Characters[Iterator]->Be_Targeted();
 				}
-			}
+			
 		}
 
 	}

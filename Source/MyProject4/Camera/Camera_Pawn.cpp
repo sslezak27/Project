@@ -61,6 +61,11 @@ void ACamera_Pawn::OnMouseRotateY(const float value)
 
 }
 
+void ACamera_Pawn::Set_Camera_Location(FVector Location, FRotator Rotation)
+{
+	cameraComponent->Set_Camera_Location(Location, Rotation);
+}
+
 void ACamera_Pawn::OnMouseRotateX(const float value)
 {
 	if (value != 0.f)

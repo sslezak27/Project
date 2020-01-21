@@ -10,17 +10,15 @@ Attack_Base::Attack_Base()
 Attack_Base::~Attack_Base()
 {
 }
-Attack_Base::Attack_Base(float Dmg, float Range,float Fatigue, float Hit_Chance, int8 Type,float Stun, float Vx, float Vy, float grav)
+Attack_Base::Attack_Base(float Dmg, float Range,float Fatigue, float Hit_Chance, int8 Type,float RSpeed, int8 RangedType)
 {
 	Attack_Dmg = Dmg;
 	Attack_Range = Range;
 	Base_Hit_Chance = Hit_Chance;
 	Attack_Type = Type;
-	Ranged_Vx = Vx;
-	Ranged_Vy = Vy;
-	gravity = grav;
 	Attack_Fatigue = Fatigue;
-	Stun_Chance = Stun;
+	Ranged_Speed = RSpeed;
+	Ranged_Type = RangedType;
 
 }
 float Attack_Base::Calculate_Attack_Yaw(const FVector& Starting_Location, const FVector& Target_Location)

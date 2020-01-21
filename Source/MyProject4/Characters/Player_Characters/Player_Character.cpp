@@ -23,6 +23,8 @@ APlayer_Character::APlayer_Character()
 
 	}
 	CursorToWorld->DecalSize = FVector(1.0f, 1.0f, 1.0f);
+	CursorToWorld->SetRelativeRotation(FRotator(100,300, 90));
+	GetMesh()->SetWorldRotation(FRotator(300, 330, 90));
 	//CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 	if(GEngine)
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "CONSTRUCTED THIS uadhkgaejjeagfkjaeguejgkfulkesgfluisrgrsgjflsgfksljrhglkgrslkrs");
@@ -30,8 +32,8 @@ APlayer_Character::APlayer_Character()
 	Active_Weapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"));
 	//Weapon = CreateDefaultSubobject<Base_Weapon>(TEXT("WEAPON"));
 
-	Attack_Base Temp_Skill(20.0f, 50.f, 70.f, 1, 500.f, 0.f,0, 10);
-	Current_Skill = Temp_Skill;
+	//tack_Base Temp_Skill(20.0f, 50.f, 70.f, 1, 500.f, 0.f,0, 10);
+	//	ent_Skill = Temp_Skill;
 }
 
 void APlayer_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -46,6 +48,9 @@ void APlayer_Character::BeginPlay()
 	Attack_Primary = BaseWeapon.Get_Attack_Primary(Weapon_Type);
 	Attack_Secondary = BaseWeapon.Get_Attack_Secondary(Weapon_Type);
 	Current_Skill = Attack_Primary;
+	CursorToWorld->SetWorldRotation(FRotator(100, 300, 90));
+	//GetMesh()->SetWorldRotation(FRotator(300, 330, 90));
+	//SetActorRelativeRotation(FRotator(300, 330, 90));
 	//UStaticMesh* Mesh_To_Set = Get_Component(Weapon_Type);
 	UStaticMesh* Mesh_To_Set = BaseWeapon.Get_Component(Weapon_Type);;
 	if (Mesh_To_Set != nullptr)
@@ -56,15 +61,16 @@ void APlayer_Character::BeginPlay()
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "WE DID IT BOYSZZZZZZZZZxMISSSIONFAILED");
-}
-void APlayer_Character::Jumps()
-{
-	
-}
+	if (Attack_Secondary.Ranged_Type == 1)
+	{
+		Is_Gunman = true;
+		Active_Weapon->SetWorldRotation(GunRotation);
+	}
+}	
 
 int APlayer_Character::Roll_Iniciative()
 {
-	return Iniciative + FMath::FRandRange(0, 300);
+	return Iniciative + FMath::FRandRange(-50, 50);
 }
 bool APlayer_Character::Do_Turn(FVector Move_Location)
 {	
@@ -120,6 +126,8 @@ void APlayer_Character::Turn_End()
 
 void APlayer_Character::Move_End()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "Player Move Ended");
+	Is_Moving = false;
 	if (Action_Points_Current < 5)
 	{
 		Turn_End();
@@ -187,25 +195,6 @@ bool APlayer_Character::Attack_Target(AMyCharacter* Target)
 			}
 		}
 
-		else if (Current_Skill.Attack_Type == 1)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, "ATTACK_TARGET RANGED");
-			FRotator Current_Rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target->GetActorLocation());
-
-			//Current_Rotator.Yaw =
-			FaceRotation(Current_Rotator);
-			Reset_Scale();
-			Is_Attacking = true;
-			Target_Of_Attack = Target;
-			FVector Current_Location = GetActorLocation();
-			FVector Arrow_Location = FVector(Current_Location.X, Current_Location.Y, Current_Location.Y + 100.f);
-
-			Current_Arrow = GetWorld()->SpawnActor<AArrow>(Arrow_Location, Current_Rotator);
-			Current_Arrow->Setup_Component(Current_Skill.Calculate_Attack_Yaw(Arrow_Location,Target->GetActorLocation()), Current_Skill.Ranged_Vx, Current_Rotator);
-			//Turn_End();
-
-			return true;
-		}
 		else
 			return false;
 	}

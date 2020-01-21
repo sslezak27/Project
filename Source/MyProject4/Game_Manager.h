@@ -27,7 +27,7 @@ public:
 	// Sets default values for this actor's properties
 	AGame_Manager();
 	int Turn_Done[7] = {};
-	AA_HUD* HUD = nullptr;
+	AA_HUD* HUD_ = nullptr;
 	//TActorIterator<AMyCharacter>* Characters[7] = {};
 	TArray<AMyCharacter*> Characters;
 	bool Player_Turn = false;    //Obs³uga tury gracza
@@ -35,6 +35,18 @@ public:
 	void Attack_Player(AMyCharacter* Target);
 	void End_Player_Turn();
 	void Reset_Player_Targets();
+	bool Can_Player_Aim();
+	void Player_Aim(FVector Location);
+	void Player_Shoot(FVector Location);
+	void Player_End_Aim();
+	void Begin_Combat();
+
+
+	UFUNCTION()
+		void Spawn_Player_Actors(int number, TArray<int> bounds);
+	UFUNCTION()
+		void Spawn_AI_Actors(int number, TArray<int> bounds);
+
  
 	TArray<AAI_Character*> AI_Characters;
 	TArray<APlayer_Character*> Player_Characters;
@@ -49,10 +61,20 @@ private:
 	bool Spawned_Player_Controller = false;
 	bool Spawned_AI_Controller = false;
 	Combat_Manager Manager_Combat;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ActorSpawning")
+		TSubclassOf<AMyCharacter> Player_BP;
+	UPROPERTY(EditDefaultsOnly, Category = "ActorSpawning")
+		TSubclassOf<AMyCharacter> AI_BP;
+
+	bool Game_Started = false;
+
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void Begin_Combat();
+
 	void Roll_Iniciative();
 	void Move_To_Start();
 	void Starting_Positons();

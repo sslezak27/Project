@@ -26,6 +26,7 @@ class MYPROJECT4_API APlayer_Character : public AMyCharacter
 		virtual void Tick(float DeltaTime) override;
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 			class UDecalComponent* CursorToWorld;
+
 		virtual void Move_End() override;				
 		AAI_Controller* AI_Controller = nullptr;
 		void Reset_Scale(); //Resetuje rozmiar ko³a
@@ -39,9 +40,9 @@ class MYPROJECT4_API APlayer_Character : public AMyCharacter
 	private:
 
 		AArrow* Current_Arrow = nullptr;
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+			FRotator GunRotation;
 
-
-		void Jumps();
 		Pathfinder Pathfinder;
 //	UPROPERTY(VisibleDefaultsOnly, Category = "Sword") // This is so we can set the mesh in the editor
 	//	UStaticMeshComponent* Weapon;

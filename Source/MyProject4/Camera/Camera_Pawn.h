@@ -15,7 +15,7 @@ class MYPROJECT4_API ACamera_Pawn : public ASpectatorPawn
 	
 	GENERATED_BODY()
 
-		friend class APlayer_Controller;
+	//	friend class APlayer_Controller;
 
 public:
 	ACamera_Pawn(const FObjectInitializer& ObjectInitializer);
@@ -27,14 +27,16 @@ public:
 		return cameraComponent;
 	}
 
-private:
+	
+public:
 	void MoveForward(float value);
 	void MoveRight(float value);
 	void OnMouseScrollUp();
 	void OnMouseScrollDown();
 	void OnMouseRotateX(float value);
 	void OnMouseRotateY(float value);
+	void Set_Camera_Location(FVector Location, FRotator Rotation);
 
-
+private:
 	UCamera_Component* cameraComponent;
 };

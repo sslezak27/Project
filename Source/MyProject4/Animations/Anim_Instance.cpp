@@ -15,6 +15,7 @@ void UAnim_Instance::UpdateAnimationProperties()
 		isGettingHit = MyCharacter->Get_Is_Being_Attacked();
 		isDodging = MyCharacter->Get_Is_Dodging();
 		isAlive = MyCharacter->Get_Is_Alive();
+		isGunman = MyCharacter->Is_Gunman;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("(%d)"),isCharacterAttacking));
 		characterMovementSpeed = MyCharacter->GetVelocity().Size();
 	}

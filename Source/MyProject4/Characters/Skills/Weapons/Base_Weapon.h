@@ -32,11 +32,36 @@ private:
 	UStaticMesh* Weapon;
 	UPROPERTY()
 	UStaticMesh* Axe;
+	UPROPERTY()
+		UStaticMesh* AR4;
+	UPROPERTY()
+		UStaticMesh* KA;
+	UPROPERTY()
+		UStaticMesh* AK;
+	UPROPERTY()
+		UStaticMesh* AKU;
+	UPROPERTY()
+		UStaticMesh* SMG;
+
 
 	Attack_Base Attack_Primary_Sword;
 	Attack_Base Attack_Secondary_Sword;
 	Attack_Base Attack_Primary_Axe;
 	Attack_Base Attack_Secondary_Axe;
+
+
+	Attack_Base Attack_Primary_AR4;
+	Attack_Base Attack_Secondary_AR4;
+	Attack_Base Attack_Primary_KA;
+	Attack_Base Attack_Secondary_KA;
+
+	Attack_Base Attack_Primary_AK;
+	Attack_Base Attack_Secondary_AK;
+	Attack_Base Attack_Primary_AKU;
+	Attack_Base Attack_Secondary_AKU;
+	Attack_Base Attack_Primary_SMG;
+	Attack_Base Attack_Secondary_SMG;
+
 
 	UPROPERTY() 
 	UStaticMesh* Sword;
