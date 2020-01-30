@@ -3,7 +3,6 @@
 
 #include "MyGameModeBase.h"
 
-
 void AMyGameModeBase::StartPlay()
 {
 	Super::StartPlay();
